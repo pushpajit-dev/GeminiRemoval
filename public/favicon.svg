@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="wandGrad" x1="12" y1="52" x2="42" y2="22" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <linearGradient id="starGrad" x1="38" y1="8" x2="58" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#67e8f9"/>
+      <stop offset="50%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  
+  <!-- Wand handle -->
+  <line x1="12" y1="52" x2="38" y2="26" stroke="url(#wandGrad)" stroke-width="5" stroke-linecap="round"/>
+  <!-- Wand grip band -->
+  <line x1="18" y1="46" x2="22" y2="42" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round" opacity="0.9"/>
+  <!-- Wand tip glow -->
+  <circle cx="39" cy="25" r="3.5" fill="#ffffff" filter="url(#glow)"/>
+
+  <!-- Magic Sparkle Star (Gemini 4-point style) -->
+  <path d="M48 6 C48 13, 49 14, 56 14 C49 14, 48 15, 48 22 C48 15, 47 14, 40 14 C47 14, 48 13, 48 6 Z" fill="url(#starGrad)" filter="url(#glow)"/>
+  
+  <!-- Small Accent Sparkles -->
+  <path d="M57 26 C57 28.5, 57.5 29, 60 29 C57.5 29, 57 29.5, 57 32 C57 29.5, 56.5 29, 54 29 C56.5 29, 57 28.5, 57 26 Z" fill="#67e8f9"/>
+  <path d="M33 9 C33 11, 33.5 11.5, 35.5 11.5 C33.5 11.5, 33 12, 33 14 C33 12, 32.5 11.5, 30.5 11.5 C32.5 11.5, 33 11, 33 9 Z" fill="#c084fc"/>
+  <circle cx="27" cy="18" r="1.5" fill="#a5f3fc"/>
+</svg>
