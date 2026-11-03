@@ -75,13 +75,13 @@ function createRuntimeCanvas(width, height) {
         canvas.height = height;
         return canvas;
     }
-    throw new Error('当前环境没有可用 Canvas');
+    throw new Error('Canvas is not available in the current environment');
 }
 
 function get2dContext(canvas) {
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) {
-        throw new Error('无法创建 2D Canvas 上下文');
+        throw new Error('Failed to create 2D Canvas context');
     }
     return ctx;
 }
@@ -98,7 +98,7 @@ async function getVideoContext(file) {
     const videoTrack = await input.getPrimaryVideoTrack();
     if (!videoTrack) {
         input.dispose();
-        throw new Error('文件中没有可处理的视频轨');
+        throw new Error('No processable video track found in file');
     }
     return { input, videoTrack };
 }
@@ -312,7 +312,7 @@ export async function detectGeminiVideoWatermark(file, options = {}) {
         }
 
         if (!frames.length) {
-            throw new Error('无法从视频中抽取检测帧');
+            throw new Error('Failed to extract detection frames from video');
         }
 
         onProgress({
@@ -940,7 +940,7 @@ export async function removeGeminiVideoWatermark(file, options = {}) {
     onProgress({ phase: 'detect', progress: 1, metadata, detection });
 
     if (!detection.isConfident && options.allowLowConfidence !== true) {
-        throw new Error('视频水印检测置信度偏低，已停止导出。可打开低置信导出后重试。');
+        throw new Error('Watermark detection confidence too low. Enable low confidence export to retry.');
     }
 
     const videoEncodingConfig = createVideoExportEncodingConfig(videoBitrate);
@@ -954,7 +954,7 @@ export async function removeGeminiVideoWatermark(file, options = {}) {
         contentHint: videoEncodingConfig.contentHint
     });
     if (!canEncodeAvc) {
-        throw new Error('当前浏览器不支持 WebCodecs H.264/AVC 编码，请使用新版 Chrome 或 Edge。');
+        throw new Error('Browser does not support WebCodecs H.264/AVC. Please use latest Chrome or Edge.');
     }
 
     const { input, videoTrack } = await getVideoContext(file);
@@ -1084,7 +1084,7 @@ export async function removeGeminiVideoWatermark(file, options = {}) {
         options.signal?.throwIfAborted();
 
         if (!target.buffer) {
-            throw new Error('视频导出失败，输出为空');
+            throw new Error('Video export failed: empty output');
         }
 
         return {

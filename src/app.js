@@ -153,23 +153,47 @@ function setupEventListeners() {
     uploadArea.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', handleFileSelect);
 
-    document.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadArea.classList.add('border-primary', 'bg-emerald-50');
+    ['dragenter', 'dragover'].forEach(eventName => {
+        document.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (uploadArea) uploadArea.classList.add('drag-over');
+            const vdz = document.getElementById('videoDropzone');
+            if (vdz) vdz.classList.add('drag-over');
+        });
     });
 
     document.addEventListener('dragleave', (e) => {
-        if (e.clientX === 0 && e.clientY === 0) {
-            uploadArea.classList.remove('border-primary', 'bg-emerald-50');
+        if (e.clientX <= 0 || e.clientY <= 0) {
+            if (uploadArea) uploadArea.classList.remove('drag-over');
+            const vdz = document.getElementById('videoDropzone');
+            if (vdz) vdz.classList.remove('drag-over');
         }
     });
 
     document.addEventListener('drop', (e) => {
         e.preventDefault();
-        uploadArea.classList.remove('border-primary', 'bg-emerald-50');
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            handleFiles(Array.from(e.dataTransfer.files));
+        e.stopPropagation();
+        if (uploadArea) uploadArea.classList.remove('drag-over');
+        const vdz = document.getElementById('videoDropzone');
+        if (vdz) vdz.classList.remove('drag-over');
+
+        const files = Array.from(e.dataTransfer?.files || []);
+        if (files.length === 0) return;
+
+        const isVideo = files.some(f => f.type.startsWith('video/') || /\.(mp4|webm|mov|mkv)$/i.test(f.name));
+        if (isVideo) {
+            const vFile = files.find(f => f.type.startsWith('video/') || /\.(mp4|webm|mov|mkv)$/i.test(f.name));
+            if (window.__gwrSwitchToVideo) {
+                window.__gwrSwitchToVideo(vFile);
+            }
+            return;
         }
+
+        if (window.__gwrSwitchToImage) {
+            window.__gwrSwitchToImage();
+        }
+        handleFiles(files);
     });
 
     document.addEventListener('paste', (e) => {
@@ -196,6 +220,7 @@ function reset() {
     cleanupBatchItems();
     singlePreview.style.display = 'none';
     multiPreview.style.display = 'none';
+    if (uploadArea) uploadArea.style.display = 'flex';
     fileInput.value = '';
     imageList.innerHTML = '';
     updateProgress();
@@ -324,54 +349,36 @@ async function consumePendingImageHandoff() {
         window.history.replaceState(null, '', window.location.pathname);
     } catch (error) {
         console.warn('image handoff unavailable:', error);
-        setStatusMessage(error.message || '读取图片暂存失败，请重新选择文件。', 'warn');
+        setStatusMessage(error.message || 'Failed to read image cache. Please select file again.', 'warn');
     }
 }
 
 function renderSingleImageMeta(item) {
-    if (!item?.originalImg) return;
-
-    const watermarkInfo = resolveDisplayWatermarkInfo(
-        item,
-        getEstimatedWatermarkInfo(item)
-    );
-    if (!watermarkInfo) return;
-
+    if (!item?.originalImg || !originalInfo) return;
     originalInfo.innerHTML = `
-        <p>${TEXT.size}: ${item.originalImg.width}x${item.originalImg.height}</p>
-        <p>${TEXT.watermark}: ${watermarkInfo.size}x${watermarkInfo.size}</p>
-        <p>${TEXT.position}: (${watermarkInfo.position.x},${watermarkInfo.position.y})</p>
+        <span class="steel-pill">${item.originalImg.width} × ${item.originalImg.height}</span>
     `;
 }
 
 function getProcessedStatusPresentation(item) {
     const presentation = resolveProcessedStatusPresentation(item);
     return {
-        label: TEXT[presentation.messageKey],
+        label: TEXT[presentation.messageKey] || 'Cleaned',
         tone: presentation.tone
     };
 }
 
 function renderSingleProcessedMeta(item) {
-    if (!item?.originalImg) return;
-
-    const watermarkInfo = resolveDisplayWatermarkInfo(
-        item,
-        getEstimatedWatermarkInfo(item)
-    );
-    const showWatermarkInfo = watermarkInfo && isConfirmedWatermarkDecision(item);
-    const statusPresentation = getProcessedStatusPresentation(item);
-
-    processedInfo.innerHTML = `
-        <p>${TEXT.size}: ${item.originalImg.width}x${item.originalImg.height}</p>
-        ${showWatermarkInfo ? `<p>${TEXT.watermark}: ${watermarkInfo.size}x${watermarkInfo.size}</p>` : ''}
-        ${showWatermarkInfo ? `<p>${TEXT.position}: (${watermarkInfo.position.x},${watermarkInfo.position.y})</p>` : ''}
-        <p class="${statusPresentation.tone === 'warning' ? 'text-warning' : ''}">${TEXT.status}: ${statusPresentation.label}</p>
-    `;
+    if (processedInfo) {
+        processedInfo.innerHTML = '';
+        processedInfo.style.display = 'none';
+    }
 }
 
 async function processSingle(item) {
     try {
+        if (uploadArea) uploadArea.style.display = 'none';
+        singlePreview.style.display = 'flex';
         const img = await loadImage(item.file);
         item.originalImg = img;
         item.originalUrl = img.src;
@@ -409,11 +416,11 @@ function createImageCard(item) {
     card.innerHTML = `
         <div class="batch-comparison">
             <div class="batch-pane original">
-                <span class="batch-pane-label">原图</span>
+                <span class="batch-pane-label">Original</span>
                 <img id="original-${item.id}" class="batch-image" draggable="false" alt="" />
             </div>
             <div class="batch-pane processed">
-                <span class="batch-pane-label">处理后</span>
+                <span class="batch-pane-label">Cleaned</span>
                 <img id="processed-${item.id}" class="batch-image" draggable="false" alt="" />
             </div>
         </div>
@@ -427,7 +434,7 @@ function createImageCard(item) {
                 <span>${TEXT.copy}</span>
             </button>
             <button id="download-${item.id}" class="batch-button secondary" style="display: none;">
-                下载结果
+                Download
             </button>
         </div>
     `;

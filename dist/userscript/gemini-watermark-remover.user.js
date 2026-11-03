@@ -20925,9 +20925,9 @@
     } catch {
     }
   }
-  var DOWNLOAD_ACTION_LABEL_PATTERN = /(download|copy|下载|复制)/i;
-  var COPY_ACTION_LABEL_PATTERN = /(copy|复制)/i;
-  var EXPLICIT_DOWNLOAD_ACTION_LABEL_PATTERN = /(download|下载)/i;
+  var DOWNLOAD_ACTION_LABEL_PATTERN = /(download|copy||)/i;
+  var COPY_ACTION_LABEL_PATTERN = /(copy|)/i;
+  var EXPLICIT_DOWNLOAD_ACTION_LABEL_PATTERN = /(download|)/i;
   var INTENT_EVENT_TYPES = ["click", "keydown"];
   var DEFAULT_INTENT_WINDOW_MS = 5e3;
   var DEFAULT_DOWNLOAD_STICKY_WINDOW_MS = 3e4;
@@ -22824,7 +22824,7 @@
   }
 
   // src/userscript/userNotice.js
-  var GWR_ORIGINAL_ASSET_REFRESH_MESSAGE = "\u65E0\u6CD5\u83B7\u53D6\u539F\u56FE\uFF0C\u8BF7\u5237\u65B0\u9875\u9762\u540E\u91CD\u8BD5";
+  var GWR_ORIGINAL_ASSET_REFRESH_MESSAGE = "\uFF0C";
   function showUserNotice(targetWindow = globalThis, message = "") {
     const normalizedMessage = typeof message === "string" ? message.trim() : "";
     if (!normalizedMessage) {
