@@ -1,5 +1,5 @@
 /*!
- * gemini-removal v1.0.46+96e7447
+ * gemini-removal v1.0.46+40c2f3d
  * Fast, private client-side watermark remover for Gemini AI images and videos
  * (c) 2026 aivorygen
  * https://github.com/pushpajit-dev/GeminiRemoval

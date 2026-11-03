@@ -35,7 +35,6 @@ const userscriptBanner = `// ==UserScript==
 // @namespace    https://github.com/pushpajit-dev/GeminiRemoval
 // @version      ${pkg.version}
 // @description  Automatically removes watermarks from Gemini AI generated images
-// @description:zh-CN 自动移除 Gemini AI 生成图像中的水印
 // @icon         https://www.google.com/s2/favicons?domain=gemini.google.com
 // @author       aivorygen
 // @license      MIT

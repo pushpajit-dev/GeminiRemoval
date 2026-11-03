@@ -41,7 +41,7 @@ import {
 
 const DEFAULT_SAMPLE_COUNT = 12;
 const DEFAULT_ALPHA_GAIN = 1;
-const DEFAULT_ADAPTIVE_ALPHA = false;
+const DEFAULT_ADAPTIVE_ALPHA = true;
 const DEFAULT_VIDEO_BITRATE = 12_000_000;
 const DEFAULT_VIDEO_KEY_FRAME_INTERVAL = 2;
 const DEFAULT_AVC_HARDWARE_ACCELERATION = 'no-preference';
@@ -729,16 +729,8 @@ function processWatermarkRoi(ctx, detection, options) {
         { x: 0, y: 0, width: position.width, height: position.height },
         alphaMap
     );
-    const shouldSkip = frameScore.confidence < options.lowConfidenceThreshold;
-
-    if (shouldSkip) {
-        return {
-            alphaGain: options.previousAlphaGain ?? options.seedAlphaGain,
-            frameScore,
-            skipped: true,
-            mode: 'skip'
-        };
-    }
+    // Ensure complete frame-by-frame cleaning across all video frames:
+    const shouldSkip = false;
 
     const roi = ctx.getImageData(position.x, position.y, position.width, position.height);
     const useAdaptiveAlpha = options.adaptiveAlpha && frameScore.confidence >= options.highConfidenceThreshold;
@@ -804,16 +796,8 @@ async function processWatermarkRoiAsync(ctx, detection, options) {
         { x: 0, y: 0, width: position.width, height: position.height },
         alphaMap
     );
-    const shouldSkip = frameScore.confidence < options.lowConfidenceThreshold;
-
-    if (shouldSkip) {
-        return {
-            alphaGain: options.previousAlphaGain ?? options.seedAlphaGain,
-            frameScore,
-            skipped: true,
-            mode: 'skip'
-        };
-    }
+    // Ensure complete frame-by-frame cleaning across all video frames:
+    const shouldSkip = false;
 
     const roi = ctx.getImageData(position.x, position.y, position.width, position.height);
     const useAdaptiveAlpha = options.adaptiveAlpha && frameScore.confidence >= options.highConfidenceThreshold;

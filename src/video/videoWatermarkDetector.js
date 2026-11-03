@@ -1116,6 +1116,49 @@ export function selectVideoWatermarkDetectionForFrame(imageSource, detection) {
     return selected;
 }
 
+function refineCandidatePositionOffset(frames, position, alphaMap, maxOffset = 3) {
+    if (!frames || !frames.length || !alphaMap || !position) return position;
+    let bestX = position.x;
+    let bestY = position.y;
+    let bestScore = -Infinity;
+
+    for (let dy = -maxOffset; dy <= maxOffset; dy++) {
+        const testY = position.y + dy;
+        if (testY < 0) continue;
+        for (let dx = -maxOffset; dx <= maxOffset; dx++) {
+            const testX = position.x + dx;
+            if (testX < 0) continue;
+
+            let scoreSum = 0;
+            let sampleCount = 0;
+            const checkLimit = Math.min(frames.length, 6);
+            for (let f = 0; f < checkLimit; f++) {
+                const imgData = frames[f] && frames[f].imageData;
+                if (!imgData || testX + position.width > imgData.width || testY + position.height > imgData.height) continue;
+                const region = { x: testX, y: testY, size: position.width };
+                const spatial = computeRegionSpatialCorrelation({ imageData: imgData, alphaMap, region });
+                const gradient = computeRegionGradientCorrelation({ imageData: imgData, alphaMap, region });
+                scoreSum += Math.max(0, spatial) * 0.35 + Math.max(0, gradient) * 0.65;
+                sampleCount++;
+            }
+            if (sampleCount > 0) {
+                const avgScore = scoreSum / sampleCount;
+                if (avgScore > bestScore) {
+                    bestScore = avgScore;
+                    bestX = testX;
+                    bestY = testY;
+                }
+            }
+        }
+    }
+
+    return {
+        ...position,
+        x: bestX,
+        y: bestY
+    };
+}
+
 export function detectDiamondVideoWatermarkFromFrames({
     frames,
     width,
@@ -1197,6 +1240,9 @@ export function detectDiamondVideoWatermarkFromFrames({
         alphaMapOptions
     });
     const { alphaMap, alphaSeed } = alphaSelection;
+    const refinedPos = refineCandidatePositionOffset(frames, position, alphaMap);
+    position.x = refinedPos.x;
+    position.y = refinedPos.y;
     const detections = [{
         watermarkKind: 'diamond',
         position,
@@ -1360,6 +1406,9 @@ export async function detectDiamondVideoWatermarkFromFramesAsync({
         alphaMapOptions
     });
     const { alphaMap, alphaSeed } = alphaSelection;
+    const refinedPos = refineCandidatePositionOffset(frames, position, alphaMap);
+    position.x = refinedPos.x;
+    position.y = refinedPos.y;
     const detections = [{
         watermarkKind: 'diamond',
         position,

@@ -361,18 +361,18 @@
               <input id="adaptiveAlpha" type="checkbox" checked>
               <input id="highQualityCleanup" type="checkbox" checked>
               <select id="denoiseBackend">
+                <option value="allenk-fdncnn-browser-spike" selected>AI FDnCNN</option>
+                <option value="canvas-footprint-polish">Canvas Polish</option>
                 <option value="none">None</option>
-                <option value="canvas-footprint-polish" selected>Canvas Polish</option>
-                <option value="allenk-fdncnn-browser-spike">AI FDnCNN</option>
               </select>
               <button id="relocatedReviewPresetBtn" type="button"></button>
-              <span id="edgeDenoiseStrengthValue">0.25</span>
-              <input id="edgeDenoiseStrength" type="range" min="0" max="1" step="0.05" value="0.25">
+              <span id="edgeDenoiseStrengthValue">1.80</span>
+              <input id="edgeDenoiseStrength" type="range" min="0" max="3" step="0.05" value="1.80">
               <span id="residualCleanupValue">1.50</span>
               <input id="residualCleanup" type="range" min="0" max="1.80" step="0.05" value="1.50">
-              <input id="sampleCount" type="number" min="4" max="24" step="1" value="8">
-              <input id="videoBitrateMbps" type="number" min="1" max="80" step="0.5" value="12">
-              <input id="allowLowConfidence" type="checkbox">
+              <input id="sampleCount" type="number" min="4" max="24" step="1" value="12">
+              <input id="videoBitrateMbps" type="number" min="1" max="80" step="0.5" value="16">
+              <input id="allowLowConfidence" type="checkbox" checked>
               <div id="autoPresetSummary"></div>
               <button id="videoDetectBtn" type="button"></button>
             </div>

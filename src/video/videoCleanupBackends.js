@@ -9,11 +9,11 @@ import {
 } from '../core/allenkFdncnnDenoise.js';
 
 const DEFAULT_RESIDUAL_CLEANUP_STRENGTH = 1.5;
-const DEFAULT_HIGH_QUALITY_CLEANUP = false;
+const DEFAULT_HIGH_QUALITY_CLEANUP = true;
 const DEFAULT_TEXTURE_REPAIR = false;
 const DEFAULT_TEXTURE_REPAIR_STRENGTH = 0.85;
-const DEFAULT_DENOISE_BACKEND = 'none';
-const DEFAULT_EDGE_DENOISE_STRENGTH = 0.65;
+const DEFAULT_DENOISE_BACKEND = 'allenk-fdncnn-browser-spike';
+const DEFAULT_EDGE_DENOISE_STRENGTH = 1.8;
 const DEFAULT_ALLENK_FDNCNN_SIGMA = 25;
 const DEFAULT_ALLENK_FDNCNN_REUSE_THRESHOLD = 6.5;
 
@@ -524,7 +524,11 @@ export function buildGradientWeightMap(alphaMap, width, height, strength) {
 
     const smoothed = gaussianBlurFloatMap(dilated, width, height, 1.15);
     for (let i = 0; i < smoothed.length; i++) {
-        smoothed[i] = Math.min(1, smoothed[i] * strength);
+        const edgeWeight = smoothed[i];
+        const alpha = Math.abs(alphaMap[i] || 0);
+        const bodyWeight = Math.min(1, alpha * 1.35);
+        const combined = Math.max(edgeWeight, bodyWeight * 0.85);
+        smoothed[i] = Math.min(1, combined * strength);
     }
     return smoothed;
 }

@@ -251,5 +251,45 @@ function getExplicitCandidates(width, height) {
         }), width, height)).filter(isCandidateInBounds);
     }
 
-    return [];
+    // General resolution fallback candidates (adaptive sizes and margins proportional to resolution)
+    const scale = Math.min(width / REFERENCE_WIDTH, height / REFERENCE_HEIGHT);
+    const candidateSizes = [
+        Math.round(48 * scale),
+        Math.round(72 * scale),
+        Math.round(36 * scale),
+        Math.round(64 * scale)
+    ].filter((s) => s >= 24 && s <= Math.min(width, height));
+
+    const candidateMargins = [
+        Math.round(72 * scale),
+        Math.round(96 * scale),
+        Math.round(108 * scale),
+        Math.round(144 * scale),
+        Math.round(48 * scale)
+    ].filter((m) => m >= 12 && m < Math.min(width, height));
+
+    const generated = [];
+    let priority = 10;
+    for (const size of [...new Set(candidateSizes)]) {
+        for (const margin of [...new Set(candidateMargins)]) {
+            if (width - margin - size < 0 || height - margin - size < 0) continue;
+            generated.push({
+                id: "veo-auto-" + size + "-" + margin,
+                label: "Auto " + size + "px, margin " + margin,
+                size,
+                marginRight: margin,
+                marginBottom: margin,
+                sourcePriority: priority++
+            });
+        }
+    }
+
+    return generated.map((candidate) => withVideoBounds(buildCandidate(candidate, width, height, 1, {
+        referenceSize: false,
+        scaledFromReference: true,
+        sourceCandidateId: null,
+        sourceFamily: 'auto-resolution-prior',
+        evidenceGate: 'standard',
+        exactSizeVariant: true
+    }), width, height)).filter(isCandidateInBounds);
 }

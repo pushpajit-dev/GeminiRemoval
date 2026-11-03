@@ -58,13 +58,13 @@ export function getRelocatedReviewPresetConfig() {
         label: 'Auto AI Cleaner',
         description: 'Automatically detect and clean watermark using client-side AI.',
         alphaGain: DEFAULT_AUTO_ALPHA_GAIN,
-        adaptiveAlpha: false,
-        highQualityCleanup: DEFAULT_HIGH_QUALITY_CLEANUP,
-        denoiseBackend: VIDEO_DENOISE_BACKENDS.CANVAS_FOOTPRINT_POLISH,
-        edgeDenoiseStrength: DEFAULT_RELOCATED_FOOTPRINT_EDGE_DENOISE_STRENGTH,
-        residualCleanupStrength: DEFAULT_RELOCATED_FOOTPRINT_RESIDUAL_CLEANUP_STRENGTH,
+        adaptiveAlpha: true,
+        highQualityCleanup: true,
+        denoiseBackend: VIDEO_DENOISE_BACKENDS.ALLENK_FDNCNN_BROWSER_SPIKE,
+        edgeDenoiseStrength: 1.8,
+        residualCleanupStrength: 1.5,
         sampleCount: DEFAULT_AUTO_SAMPLE_COUNT,
-        videoBitrateMbps: 12,
+        videoBitrateMbps: 16,
         allowLowConfidence: true
     };
 }
@@ -75,14 +75,14 @@ export function getStandardAutoPresetConfig() {
         label: 'Auto AI Cleaner',
         description: 'Clean bottom-right Gemini watermark locally.',
         alphaGain: DEFAULT_AUTO_ALPHA_GAIN,
-        adaptiveAlpha: false,
-        highQualityCleanup: DEFAULT_HIGH_QUALITY_CLEANUP,
+        adaptiveAlpha: true,
+        highQualityCleanup: true,
         denoiseBackend: VIDEO_DENOISE_BACKENDS.ALLENK_FDNCNN_BROWSER_SPIKE,
         edgeDenoiseStrength: DEFAULT_AUTO_AI_EDGE_DENOISE_STRENGTH,
-        residualCleanupStrength: DEFAULT_AUTO_AI_RESIDUAL_CLEANUP_STRENGTH,
+        residualCleanupStrength: 1.5,
         sampleCount: DEFAULT_AUTO_SAMPLE_COUNT,
         videoBitrateMbps: '',
-        allowLowConfidence: false
+        allowLowConfidence: true
     };
 }
 
@@ -90,8 +90,8 @@ export function getVeoTextAutoPresetConfig() {
     return {
         ...getStandardAutoPresetConfig(),
         id: 'veo-text-auto',
-        edgeDenoiseStrength: DEFAULT_VEO_TEXT_AI_EDGE_DENOISE_STRENGTH,
-        residualCleanupStrength: DEFAULT_VEO_TEXT_AI_RESIDUAL_CLEANUP_STRENGTH
+        edgeDenoiseStrength: 1.8,
+        residualCleanupStrength: 1.5
     };
 }
 
